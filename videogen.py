@@ -3,7 +3,8 @@ import os
 import cv2
 
 # replace this with the actual data path
-path = 'datasets/kinetics-dataset-main/k700-2020/'
+#path = 'datasets/kinetics-dataset-main/k700-2020/'
+path = 'test-samples/'
 
 # get the list of files in the train, test, and val folders
 train_files = os.listdir(path + 'train')
