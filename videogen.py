@@ -16,9 +16,9 @@ dataset = []
 
 # read the train videos
 def read_videos(split):
-    dir = path + split + '/'
+    dir = path + split + '/' # path as text
     
-    for folder in dir:
+    for folder in os.listdir(dir):
         files = os.listdir(dir + folder + '/')
         print(folder)
         print()
