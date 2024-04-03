@@ -46,3 +46,5 @@ ds = np.load('dataset.npy', allow_pickle=True)
 # get the first video and its label
 video, label = ds[0]
 print(label)
+print()
+print(video)
