@@ -11,26 +11,31 @@ train_files = os.listdir(path + 'train')
 test_files = os.listdir(path + 'test')
 val_files = os.listdir(path + 'val')
 
-# create a np array to store the videos
-dataset = np.zeros((len(train_files) + len(test_files) + len(val_files), 90, 128, 128, 3))
+# create a np array to store the videos with their labels -- each folder is the label of all the videos in it
+dataset = []
 
-# function to add frames to the dataset
-def add_frames(video, i_start, path):
-    for i, file in enumerate(train_files):
-        video = cv2.VideoCapture(path + file)
-        frames = []
-        for _ in range(30):
-            ret, frame = video.read()
-            if not ret:
-                break
-            frame = cv2.resize(frame, (128, 128))
-            frames.append(frame)
-        dataset[i + i_start] = np.array(frames)
+# read the train videos
+def read_videos(split):
+    dir = path + split + '/'
+    
+    for folder in dir:
+        files = os.listdir(dir)
+        for file in files:
+            cap = cv2.VideoCapture(dir + '/' + file)
+            frames = []
+            for _ in range(30):
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                frames.append(frame)
+            dataset.append([np.array(frames), folder])
+            cap.release()
+            
+# read the videos in the train, test, and val folders
+read_videos('train')
+read_videos('test')
+read_videos('val')
 
-# add frames to the dataset for train, test, and val
-add_frames(dataset, 0, path + 'train/')
-add_frames(dataset, len(train_files), path + 'test/')
-add_frames(dataset, len(train_files) + len(test_files), path + 'val/')
-
-# save the dataset to a file
+# convert the dataset to a np array
+dataset = np.array(dataset)
 np.save('dataset.npy', dataset)
