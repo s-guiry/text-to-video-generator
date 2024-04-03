@@ -48,3 +48,9 @@ np.save('dataset.npy', dataset)
 ds = np.load('dataset.npy', allow_pickle=True)
 
 print(ds.shape)
+
+print()
+
+# also print shape of each video
+for i in range(10):
+    print(ds[i][0].shape, ds[i][1])
