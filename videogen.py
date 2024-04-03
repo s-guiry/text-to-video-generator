@@ -5,6 +5,7 @@ import cv2
 # replace this with the actual data path
 #path = 'datasets/kinetics-dataset-main/k700-2020/'
 path = 'test-samples/'
+fps = 10
 
 # get the list of files in the train, test, and val folders
 train_files = os.listdir(path + 'train')
@@ -23,9 +24,11 @@ def read_videos(split):
         
         for file in os.listdir(folder_path):
             cap = cv2.VideoCapture(folder_path + file)
-            cap = cv2.resize(cap, (128, 128))
+            cap.set(3, 128)
+            cap.set(4, 128)
+            cap.set(cv2.CAP_PROP_FPS, fps)
             frames = []
-            for _ in range(30):
+            for _ in range(fps * 5):
                 ret, frame = cap.read()
                 if not ret:
                     break
