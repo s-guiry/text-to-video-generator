@@ -23,6 +23,7 @@ def read_videos(split):
         
         for file in os.listdir(folder_path):
             cap = cv2.VideoCapture(folder_path + file)
+            cap = cv2.resize(cap, (128, 128))
             frames = []
             for _ in range(30):
                 ret, frame = cap.read()
