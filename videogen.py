@@ -24,15 +24,13 @@ def read_videos(split):
         
         for file in os.listdir(folder_path):
             cap = cv2.VideoCapture(folder_path + file)
-            cap.set(3, 128)
-            cap.set(4, 128)
             cap.set(cv2.CAP_PROP_FPS, fps)
             frames = []
             for _ in range(fps * 5):
                 ret, frame = cap.read()
                 if not ret:
                     break
-                frames.append(frame)
+                frames.append(cv2.resize(frame, (128, 128)))
             dataset.append(np.array([np.array(frames), folder]))
             cap.release()
     
