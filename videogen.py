@@ -19,21 +19,18 @@ def read_videos(split):
     dir = path + split + '/' # path as text
     
     for folder in os.listdir(dir):
-        files = os.listdir(dir + folder + '/')
-        print(folder)
-        print()
-        print(files)
+        folder_path = dir + folder + '/'
         
-        # for file in files:
-        #     cap = cv2.VideoCapture(dir + '/' + file)
-        #     frames = []
-        #     for _ in range(30):
-        #         ret, frame = cap.read()
-        #         if not ret:
-        #             break
-        #         frames.append(frame)
-        #     dataset.append(np.array([np.array(frames), folder]))
-        #     cap.release()
+        for file in os.listdir(folder_path):
+            cap = cv2.VideoCapture(folder_path + file)
+            frames = []
+            for _ in range(30):
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                frames.append(frame)
+            dataset.append([frames, folder])
+            cap.release()
             
 # read the videos in the train, test, and val folders
 read_videos('train')
@@ -41,11 +38,11 @@ read_videos('test')
 read_videos('val')
 
 # # convert the dataset to a np array
-# dataset = np.array(dataset)
-# np.save('dataset.npy', dataset)
+dataset = np.array(dataset)
+np.save('dataset.npy', dataset)
 
-# # load dataset.npy
-# ds = np.load('dataset.npy', allow_pickle=True)
-# # get the first video and its label
-# video, label = ds[0]
-# print(label)
+# load dataset.npy
+ds = np.load('dataset.npy', allow_pickle=True)
+# get the first video and its label
+video, label = ds[0]
+print(label)
