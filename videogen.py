@@ -26,28 +26,25 @@ def read_videos(split):
             frames = []
             for _ in range(30):
                 ret, frame = cap.read()
-                print(frame)
-                print()
-                exit()
                 if not ret:
                     break
                 frames.append(frame)
             dataset.append([frames, folder])
             cap.release()
+    
+    f = open(split + ".txt", "w")
+    f.write(split + " is done")
+    f.close()
             
-# read the videos in the train, test, and val folders
 read_videos('train')
 read_videos('test')
 read_videos('val')
 
-# # convert the dataset to a np array
+# convert the dataset to a np array
 dataset = np.array(dataset)
 np.save('dataset.npy', dataset)
 
 # load dataset.npy
 ds = np.load('dataset.npy', allow_pickle=True)
-# get the first video and its label
-video, label = ds[0]
-print(label)
-print()
-print(video)
+
+print(ds.shape)
