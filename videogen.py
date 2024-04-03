@@ -39,3 +39,9 @@ read_videos('val')
 # convert the dataset to a np array
 dataset = np.array(dataset)
 np.save('dataset.npy', dataset)
+
+# load dataset.npy
+ds = np.load('dataset.npy', allow_pickle=True)
+# get the first video and its label
+video, label = ds[0]
+print(label)
