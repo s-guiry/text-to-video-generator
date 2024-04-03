@@ -29,7 +29,7 @@ def read_videos(split):
                 if not ret:
                     break
                 frames.append(frame)
-            dataset.append([frames, folder])
+            dataset.append(np.array([np.array(frames), folder]))
             cap.release()
     
     f = open(split + ".txt", "w")
