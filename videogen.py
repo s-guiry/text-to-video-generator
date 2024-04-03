@@ -36,9 +36,9 @@ def read_videos(split):
         #     cap.release()
             
 # read the videos in the train, test, and val folders
-# read_videos('train')
-# read_videos('test')
-# read_videos('val')
+read_videos('train')
+read_videos('test')
+read_videos('val')
 
 # # convert the dataset to a np array
 # dataset = np.array(dataset)
