@@ -26,6 +26,9 @@ def read_videos(split):
             frames = []
             for _ in range(30):
                 ret, frame = cap.read()
+                print(frame)
+                print()
+                exit()
                 if not ret:
                     break
                 frames.append(frame)
