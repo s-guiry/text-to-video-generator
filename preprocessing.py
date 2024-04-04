@@ -38,7 +38,7 @@ def process_video(video_path, gpu):
     if np.random.randint(1, 501) == 20:
         print('Still going!', flush=True)
     
-    return np.array([np.array(frames), video_path.split('/')[-2]])
+    return np.array([np.array(frames), video_path.split('/')[2]])
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
@@ -46,8 +46,8 @@ def process_videos_parallel(video_paths):
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
     
     # create a text file to indicate that the processing is done
-    f = open(video_paths[0].split('/')[-3] + ".txt", "w")
-    f.write(video_paths[0].split('/')[-3] + " is done")
+    f = open(video_paths[0].split('/')[1] + ".txt", "w")
+    f.write(video_paths[0].split('/')[1] + " is done")
     
     return resized_videos
 
