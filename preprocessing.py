@@ -9,6 +9,7 @@ FPS = 10
 LENGTH = 5
 # PATH = 'datasets/kinetics-dataset-main/k700-2020'
 PATH = 'test-samples/'
+FRAME_SIZE = (224, 224)
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
@@ -24,12 +25,12 @@ def process_video(video_path, gpu):
             frame_gpu = cv2.cuda_GpuMat()
             frame_gpu.upload(frame)
             # Resize frame on GPU
-            resized_frame_gpu = cv2.cuda.resize(frame_gpu, (128, 128))
+            resized_frame_gpu = cv2.cuda.resize(frame_gpu, FRAME_SIZE)
             # Download resized frame from GPU
             resized_frame = resized_frame_gpu.download()
         else:
             # CPU-based resizing
-            resized_frame = cv2.resize(frame, (128, 128))
+            resized_frame = cv2.resize(frame, FRAME_SIZE)
         # append the frame as well as its label (folder name)
         frames.append(np.array(resized_frame))
     cap.release()
