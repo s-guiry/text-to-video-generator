@@ -7,7 +7,8 @@ import concurrent.futures
 USE_GPU = False
 FPS = 10
 LENGTH = 5
-PATH = 'datasets/kinetics-dataset-main/k700-2020'
+# PATH = 'datasets/kinetics-dataset-main/k700-2020'
+PATH = 'test-samples/'
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
