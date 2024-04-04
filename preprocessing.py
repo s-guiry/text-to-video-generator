@@ -67,6 +67,7 @@ import concurrent.futures
 USE_GPU = False
 FPS = 10
 LENGTH = 5
+PATH = 'datasets/kinetics-dataset-main/k700-2020'
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
@@ -92,7 +93,7 @@ def process_video(video_path, gpu):
         frames.append(np.array(resized_frame))
     cap.release()
     
-    if np.random.randint(1, 21) == 20:
+    if np.random.randint(1, 501) == 20:
         print('Still going!', flush=True)
     
     return np.array([np.array(frames), video_path.split('/')[-2]])
@@ -105,11 +106,10 @@ def process_videos_parallel(video_paths):
     return resized_videos
 
 # Paths
-path = 'test-samples/'
 fps = 10
-train_dir = os.path.join(path, 'train')
-test_dir = os.path.join(path, 'test')
-val_dir = os.path.join(path, 'val')
+train_dir = os.path.join(PATH, 'train')
+test_dir = os.path.join(PATH, 'test')
+val_dir = os.path.join(PATH, 'val')
 
 # Get list of video files
 train_files = [os.path.join(train_dir, folder, file) for folder in os.listdir(train_dir) for file in os.listdir(os.path.join(train_dir, folder))]
