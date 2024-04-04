@@ -62,14 +62,19 @@ train_dir = os.path.join(PATH, 'train')
 test_dir = os.path.join(PATH, 'test')
 val_dir = os.path.join(PATH, 'val')
 
-# Get list of video files
-train_files = [os.path.join(train_dir, folder, file) for folder in os.listdir(train_dir) for file in os.listdir(os.path.join(train_dir, folder))][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
-test_files = [os.path.join(test_dir, folder, file) for folder in os.listdir(test_dir) for file in os.listdir(os.path.join(test_dir, folder))][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
-val_files = [os.path.join(val_dir, folder, file) for folder in os.listdir(val_dir) for file in os.listdir(os.path.join(val_dir, folder))][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
+# get only the first BATCH_SIZE labels from INDEX
+train_labels = [folder for folder in os.listdir(train_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
+test_labels = [folder for folder in os.listdir(test_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
+val_labels = [folder for folder in os.listdir(val_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
+
+# Get list of video files using the labels
+train_files = [os.path.join(train_dir, folder, file) for folder in train_labels for file in os.listdir(os.path.join(train_dir, folder))]
+test_files = [os.path.join(test_dir, folder, file) for folder in test_labels for file in os.listdir(os.path.join(test_dir, folder))]
+val_files = [os.path.join(val_dir, folder, file) for folder in val_labels for file in os.listdir(os.path.join(val_dir, folder))]
 files = train_files + test_files + val_files
 
 # Process videos
-dataset = np.array([process_videos_parallel(files[i:i+BATCH_SIZE]) for i in range(0, len(files), BATCH_SIZE)])
+dataset = np.array(process_videos_parallel(files))
 
 # Save dataset
 np.save(f'dataset_p{INDEX}.npy', dataset)
