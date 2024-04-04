@@ -10,6 +10,7 @@ LENGTH = 5
 PATH = 'datasets/kinetics-dataset-main/k700-2020'
 # PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
+BATCH_SIZE = 10
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
@@ -42,7 +43,7 @@ def process_video(video_path, gpu):
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
-    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
     
     # create a text file to indicate that the processing is done
@@ -62,14 +63,10 @@ val_dir = os.path.join(PATH, 'val')
 train_files = [os.path.join(train_dir, folder, file) for folder in os.listdir(train_dir) for file in os.listdir(os.path.join(train_dir, folder))]
 test_files = [os.path.join(test_dir, folder, file) for folder in os.listdir(test_dir) for file in os.listdir(os.path.join(test_dir, folder))]
 val_files = [os.path.join(val_dir, folder, file) for folder in os.listdir(val_dir) for file in os.listdir(os.path.join(val_dir, folder))]
+files = train_files + test_files + val_files
 
 # Process videos
-resized_train = process_videos_parallel(train_files)
-resized_test = process_videos_parallel(test_files)
-resized_val = process_videos_parallel(val_files)
-
-# Combine datasets
-dataset = np.array(resized_train + resized_test + resized_val)
+dataset = np.array([process_videos_parallel(files[i:i+BATCH_SIZE]) for i in range(0, len(files), BATCH_SIZE)])
 
 # Save dataset
 np.save('dataset.npy', dataset)
