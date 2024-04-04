@@ -12,6 +12,7 @@ PATH = 'datasets/kinetics-dataset-main/k700-2020'
 # PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
 BATCH_SIZE = 50
+INDEX = input('Enter index (0 to 13 inclusive): ')
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
@@ -40,7 +41,7 @@ def process_video(video_path, gpu):
     if np.random.randint(1, 501) == 20:
         print('Still going!', flush=True)
     
-    return np.array([np.array(frames), video_path.split('/')[2]])
+    return np.array([np.array(frames), video_path.split('/')[-1]])
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
@@ -51,8 +52,8 @@ def process_videos_parallel(video_paths):
     
     # create a text file to indicate that the processing is done
     if len(video_paths) > 0:
-        f = open(video_paths[0].split('/')[1] + ".txt", "w")
-        f.write(video_paths[0].split('/')[1] + " is done")
+        f = open(video_paths[0].split('/')[-2] + ".txt", "w")
+        f.write(video_paths[0].split('/')[-2] + " is done")
     
     return resized_videos
 
@@ -62,9 +63,9 @@ test_dir = os.path.join(PATH, 'test')
 val_dir = os.path.join(PATH, 'val')
 
 # Get list of video files
-train_files = [os.path.join(train_dir, folder, file) for folder in os.listdir(train_dir) for file in os.listdir(os.path.join(train_dir, folder))]
-test_files = [os.path.join(test_dir, folder, file) for folder in os.listdir(test_dir) for file in os.listdir(os.path.join(test_dir, folder))]
-val_files = [os.path.join(val_dir, folder, file) for folder in os.listdir(val_dir) for file in os.listdir(os.path.join(val_dir, folder))]
+train_files = [os.path.join(train_dir, folder, file) for folder in os.listdir(train_dir) for file in os.listdir(os.path.join(train_dir, folder))][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
+test_files = [os.path.join(test_dir, folder, file) for folder in os.listdir(test_dir) for file in os.listdir(os.path.join(test_dir, folder))][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
+val_files = [os.path.join(val_dir, folder, file) for folder in os.listdir(val_dir) for file in os.listdir(os.path.join(val_dir, folder))][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
 files = train_files + test_files + val_files
 
 # Process videos
@@ -74,7 +75,7 @@ dataset = np.array([process_videos_parallel(files[i:i+BATCH_SIZE]) for i in rang
 np.save('dataset.npy', dataset)
 
 # load dataset.npy
-ds = np.load('dataset.npy', allow_pickle=True)
+ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
 
 print(ds.shape)
 
