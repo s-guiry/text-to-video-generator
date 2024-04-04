@@ -2,6 +2,7 @@ import numpy as np
 import os
 import cv2
 import concurrent.futures
+import gc
 
 # Set GPU acceleration flag
 USE_GPU = False
@@ -46,6 +47,7 @@ def process_videos_parallel(video_paths):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
         executor.shutdown(wait=True)
+        gc.collect()
     
     # create a text file to indicate that the processing is done
     if len(video_paths) > 0:
