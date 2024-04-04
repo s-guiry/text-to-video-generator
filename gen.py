@@ -68,5 +68,3 @@ for epoch in range(10):
             running_loss = 0.0
             
 print('Finished Training')
-
-# save the model

@@ -92,7 +92,7 @@ def process_video(video_path, gpu):
     cap.release()
     
     if np.random.randint(1, 21) == 20:
-        print(f'Still going!')
+        print('Still going!', flush=True)
     
     return np.array(frames)
 
@@ -125,3 +125,14 @@ dataset = np.array(resized_train + resized_test + resized_val)
 
 # Save dataset
 np.save('dataset.npy', dataset)
+
+# load dataset.npy
+ds = np.load('dataset.npy', allow_pickle=True)
+
+print(ds.shape)
+
+print()
+
+# also print shape of each video
+for i in range(10):
+    print(ds[i][0].shape, ds[i][1])
