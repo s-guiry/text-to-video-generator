@@ -46,8 +46,8 @@ def process_videos_parallel(video_paths):
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
     
     # create a text file to indicate that the processing is done
-    f = open(video_paths[0].split('/')[1] + ".txt", "w")
-    f.write(video_paths[0].split('/')[1] + " is done")
+    f = open(video_paths.split('/')[1] + ".txt", "w")
+    f.write(video_paths.split('/')[1] + " is done")
     
     return resized_videos
 
