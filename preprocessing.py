@@ -72,7 +72,7 @@ files = train_files + test_files + val_files
 dataset = np.array([process_videos_parallel(files[i:i+BATCH_SIZE]) for i in range(0, len(files), BATCH_SIZE)])
 
 # Save dataset
-np.save('dataset.npy', dataset)
+np.save(f'dataset_p{INDEX}.npy', dataset)
 
 # load dataset.npy
 ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
