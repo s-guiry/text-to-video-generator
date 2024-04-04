@@ -15,7 +15,7 @@ BATCH_SIZE = 10
 # Function to read and resize videos
 def process_video(video_path, gpu):
     cap = cv2.VideoCapture(video_path)
-    cap.set(cv2.CAP_PROP_FPS, fps)
+    cap.set(cv2.CAP_PROP_FPS, FPS)
     frames = []
     for _ in range(FPS * LENGTH):
         ret, frame = cap.read()
@@ -54,7 +54,6 @@ def process_videos_parallel(video_paths):
     return resized_videos
 
 # Paths
-fps = 10
 train_dir = os.path.join(PATH, 'train')
 test_dir = os.path.join(PATH, 'test')
 val_dir = os.path.join(PATH, 'val')
