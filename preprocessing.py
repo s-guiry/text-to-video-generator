@@ -89,13 +89,13 @@ def process_video(video_path, gpu):
             # CPU-based resizing
             resized_frame = cv2.resize(frame, (128, 128))
         # append the frame as well as its label (folder name)
-        frames.append(np.array([resized_frame, video_path.split('/')[-2]]))
+        frames.append(np.array(resized_frame))
     cap.release()
     
     if np.random.randint(1, 21) == 20:
         print('Still going!', flush=True)
     
-    return np.array(frames)
+    return np.array([frames, video_path.split('/')[-2]])
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
@@ -136,4 +136,4 @@ print()
 
 # also print shape of each video
 for i in range(10):
-    print(ds[i][0].shape, ds[i][0][1])
+    print(ds[i][0].shape, ds[i][1])
