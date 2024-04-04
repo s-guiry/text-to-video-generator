@@ -88,7 +88,8 @@ def process_video(video_path, gpu):
         else:
             # CPU-based resizing
             resized_frame = cv2.resize(frame, (128, 128))
-        frames.append(resized_frame)
+        # append the frame as well as its label (folder name)
+        frames.append(np.array([resized_frame, video_path.split('/')[-2]]))
     cap.release()
     
     if np.random.randint(1, 21) == 20:
