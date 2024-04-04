@@ -7,8 +7,8 @@ import concurrent.futures
 USE_GPU = False
 FPS = 10
 LENGTH = 5
-# PATH = 'datasets/kinetics-dataset-main/k700-2020'
-PATH = 'test-samples/'
+PATH = 'datasets/kinetics-dataset-main/k700-2020'
+# PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
 
 # Function to read and resize videos
