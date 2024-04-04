@@ -12,7 +12,7 @@ PATH = 'datasets/kinetics-dataset-main/k700-2020'
 # PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
 BATCH_SIZE = 50
-INDEX = input('Enter index (0 to 13 inclusive): ')
+INDEX = int(input('Enter index (0 to 13 inclusive): '))
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
