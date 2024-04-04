@@ -10,7 +10,7 @@ LENGTH = 5
 PATH = 'datasets/kinetics-dataset-main/k700-2020'
 # PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
-BATCH_SIZE = 10
+BATCH_SIZE = 50
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
@@ -45,6 +45,7 @@ def process_video(video_path, gpu):
 def process_videos_parallel(video_paths):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
+        executor.shutdown(wait=True)
     
     # create a text file to indicate that the processing is done
     if len(video_paths) > 0:
