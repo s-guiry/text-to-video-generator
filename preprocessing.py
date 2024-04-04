@@ -95,7 +95,7 @@ def process_video(video_path, gpu):
     if np.random.randint(1, 21) == 20:
         print('Still going!', flush=True)
     
-    return np.array([frames, video_path.split('/')[-2]])
+    return np.array([np.array(frames), video_path.split('/')[-2]])
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
