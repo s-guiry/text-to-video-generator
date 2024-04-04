@@ -65,13 +65,15 @@ import concurrent.futures
 
 # Set GPU acceleration flag
 USE_GPU = False
+FPS = 10
+LENGTH = 5
 
 # Function to read and resize videos
 def process_video(video_path, gpu):
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_FPS, fps)
     frames = []
-    while cap.isOpened():
+    for _ in range(FPS * LENGTH):
         ret, frame = cap.read()
         if not ret:
             break
@@ -98,6 +100,7 @@ def process_video(video_path, gpu):
 def process_videos_parallel(video_paths):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
+    print('FINISHED SPLIT')
     return resized_videos
 
 # Paths
@@ -113,10 +116,12 @@ test_files = [os.path.join(test_dir, folder, file) for folder in os.listdir(test
 val_files = [os.path.join(val_dir, folder, file) for folder in os.listdir(val_dir) for file in os.listdir(os.path.join(val_dir, folder))]
 
 # Process videos
-resized = process_videos_parallel(train_files + test_files + val_files)
+resized_train = process_videos_parallel(train_files)
+resized_test = process_videos_parallel(test_files)
+resized_val = process_videos_parallel(val_files)
 
 # Combine datasets
-dataset = np.array(resized)
+dataset = np.array(resized_train + resized_test + resized_val)
 
 # Save dataset
 np.save('dataset.npy', dataset)
