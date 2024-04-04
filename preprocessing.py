@@ -42,7 +42,7 @@ def process_video(video_path, gpu):
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
-    with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
     
     # create a text file to indicate that the processing is done
