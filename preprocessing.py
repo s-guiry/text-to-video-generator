@@ -5,7 +5,8 @@ import concurrent.futures
 import gc
 import math
 from multiprocessing import Pool
-import BertEmbedding
+from gensim.models import Word2Vec
+from nltk.tokenize import word_tokenize
 
 bert_embedding = BertEmbedding()
 
