@@ -5,6 +5,9 @@ import concurrent.futures
 import gc
 import math
 from multiprocessing import Pool
+import BertEmbedding
+
+bert_embedding = BertEmbedding()
 
 # Set GPU acceleration flag
 USE_GPU = False
@@ -41,8 +44,10 @@ def process_video(video_path):
     
     if np.random.randint(1, 501) == 20:
         print('Still going!', flush=True)
-    
-    return np.array([np.array(frames), video_path.split('/')[-1]])
+
+    desc = video_path.split('/')[-1]
+    bert_desc = bert_embedding([desc])
+    return np.array([np.array(frames), bert_desc])
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
