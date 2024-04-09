@@ -3,7 +3,6 @@ import os
 import cv2
 import concurrent.futures
 import gc
-import Math
 
 # Set GPU acceleration flag
 USE_GPU = False
