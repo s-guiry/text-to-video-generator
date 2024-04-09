@@ -46,7 +46,7 @@ def process_video(video_path):
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
-    with Pool() as pool:
+    with Pool(processes=50) as pool:
         resized_videos = pool.map(process_video, video_paths)
     
     # create a text file to indicate that the processing is done
