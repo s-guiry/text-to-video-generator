@@ -6,6 +6,7 @@ import gc
 import math
 from multiprocessing import Pool
 from gensim.models import Word2Vec
+import nltk
 from nltk.tokenize import word_tokenize
 
 nltk.download('punkt')
