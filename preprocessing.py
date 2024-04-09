@@ -85,7 +85,7 @@ for batch in process_videos_in_batches(files, BATCH_SIZE):
     # load dataset.npy
     # ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
     
-    print(f'Done with index {i} for batch {batch}')
+    print(f'Done with index {i}')
     print(dataset.shape)
     print(dataset[0].shape)
     print()
