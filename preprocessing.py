@@ -8,6 +8,8 @@ from multiprocessing import Pool
 from gensim.models import Word2Vec
 from nltk.tokenize import word_tokenize
 
+nltk.download('punkt')
+
 # Set GPU acceleration flag
 USE_GPU = False
 FPS = 10
