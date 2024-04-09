@@ -44,17 +44,17 @@ def process_video(video_path):
     
     return np.array([np.array(frames), video_path.split('/')[-1]])
 
-# Function to process videos in parallel
-def process_videos_parallel(video_paths):
-    with Pool(processes=50) as pool:
-        resized_videos = pool.map(process_video, video_paths)
-    
-    # create a text file to indicate that the processing is done
-    if len(video_paths) > 0:
-        f = open(video_paths[0].split('/')[-2] + ".txt", "w")
-        f.write(video_paths[0].split('/')[-2] + " is done")
-    
+# Function to process videos in parallel for a single batch
+def process_batch_parallel(batch):
+    with Pool() as pool:
+        resized_videos = pool.map(process_video, batch)
     return resized_videos
+
+# Function to process videos in batches
+def process_videos_in_batches(video_paths, batch_size):
+    for i in range(0, len(video_paths), batch_size):
+        batch = video_paths[i:i + batch_size]
+        yield batch
 
 # Paths
 train_dir = os.path.join(PATH, 'train')
@@ -77,16 +77,17 @@ for INDEX in range(math.ceil(700 / BATCH_SIZE)):
     val_files = [os.path.join(val_dir, folder, file) for folder in val_labels for file in os.listdir(os.path.join(val_dir, folder))]
     files = train_files + test_files + val_files
     
-    # Process videos
-    dataset = np.array(process_videos_parallel(files))
-    
-    # Save dataset
-    np.save(f'dataset_p{INDEX}.npy', dataset)
-    
-    # load dataset.npy
-    # ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
-    
-    print(f'Done with index {INDEX}')
-    print(dataset.shape)
-    print(dataset[0].shape)
-    print()
+    # Process videos in batches
+    for batch in process_videos_in_batches(files, BATCH_SIZE):
+        dataset = np.array(process_batch_parallel(batch))
+        
+        # Save dataset
+        np.save(f'dataset_p{INDEX}.npy', dataset)
+        
+        # load dataset.npy
+        # ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
+        
+        print(f'Done with index {INDEX} for batch {batch}')
+        print(dataset.shape)
+        print(dataset[0].shape)
+        print()
