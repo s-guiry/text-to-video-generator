@@ -47,7 +47,7 @@ def process_video(video_path):
 
     desc = video_path.split('/')[-1]
     bert_desc = bert_embedding([desc])
-    return np.array([np.array(frames), bert_desc])
+    return np.array([np.array(frames), np.array(bert_desc)])
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
