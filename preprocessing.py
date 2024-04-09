@@ -48,7 +48,6 @@ def process_videos_parallel(video_paths):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
         executor.shutdown(wait=True)
-        gc.collect()
     
     # create a text file to indicate that the processing is done
     if len(video_paths) > 0:
@@ -63,6 +62,8 @@ test_dir = os.path.join(PATH, 'test')
 val_dir = os.path.join(PATH, 'val')
 
 for INDEX in range(700 / BATCH_SIZE):
+    gc.collect()
+    
     # get only the first BATCH_SIZE labels from INDEX
     train_labels = [folder for folder in os.listdir(train_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
     test_labels = [folder for folder in os.listdir(test_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
