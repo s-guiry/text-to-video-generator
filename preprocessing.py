@@ -61,33 +61,33 @@ train_dir = os.path.join(PATH, 'train')
 test_dir = os.path.join(PATH, 'test')
 val_dir = os.path.join(PATH, 'val')
 
-for INDEX in range(math.ceil(700 / BATCH_SIZE)):
+# get only the first BATCH_SIZE labels from INDEX
+train_labels = [folder for folder in os.listdir(train_dir)]
+test_labels = [folder for folder in os.listdir(test_dir)]
+val_labels = [folder for folder in os.listdir(val_dir)]
+
+# Get list of video files using the labels
+train_files = [os.path.join(train_dir, folder, file) for folder in train_labels for file in os.listdir(os.path.join(train_dir, folder))]
+test_files = [os.path.join(test_dir, folder, file) for folder in test_labels for file in os.listdir(os.path.join(test_dir, folder))]
+val_files = [os.path.join(val_dir, folder, file) for folder in val_labels for file in os.listdir(os.path.join(val_dir, folder))]
+files = train_files + test_files + val_files
+    
+# Process videos in batches
+i = 0
+for batch in process_videos_in_batches(files, BATCH_SIZE):
     gc.collect()
     
-    # get only the first BATCH_SIZE labels from INDEX
-    train_labels = [folder for folder in os.listdir(train_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
-    test_labels = [folder for folder in os.listdir(test_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
-    val_labels = [folder for folder in os.listdir(val_dir)][INDEX * BATCH_SIZE:INDEX * BATCH_SIZE + BATCH_SIZE]
+    dataset = np.array(process_batch_parallel(batch))
     
-    print(f'got labels for index {INDEX}')
+    # Save dataset
+    np.save(f'dataset_p{i}.npy', dataset)
     
-    # Get list of video files using the labels
-    train_files = [os.path.join(train_dir, folder, file) for folder in train_labels for file in os.listdir(os.path.join(train_dir, folder))]
-    test_files = [os.path.join(test_dir, folder, file) for folder in test_labels for file in os.listdir(os.path.join(test_dir, folder))]
-    val_files = [os.path.join(val_dir, folder, file) for folder in val_labels for file in os.listdir(os.path.join(val_dir, folder))]
-    files = train_files + test_files + val_files
+    # load dataset.npy
+    # ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
     
-    # Process videos in batches
-    for batch in process_videos_in_batches(files, BATCH_SIZE):
-        dataset = np.array(process_batch_parallel(batch))
-        
-        # Save dataset
-        np.save(f'dataset_p{INDEX}.npy', dataset)
-        
-        # load dataset.npy
-        # ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
-        
-        print(f'Done with index {INDEX} for batch {batch}')
-        print(dataset.shape)
-        print(dataset[0].shape)
-        print()
+    print(f'Done with index {i} for batch {batch}')
+    print(dataset.shape)
+    print(dataset[0].shape)
+    print()
+
+    i += 1
