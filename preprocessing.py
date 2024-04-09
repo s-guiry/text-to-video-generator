@@ -5,11 +5,10 @@ import concurrent.futures
 import gc
 import math
 from multiprocessing import Pool
-from gensim.models import Word2Vec
-import nltk
-from nltk.tokenize import word_tokenize
+import tensorflow as tf
+import tensorflow_hub as hub
 
-nltk.download('punkt')
+embed = hub.load('https://tfhub.dev/google/universal-sentence-encoder/4')
 
 # Set GPU acceleration flag
 USE_GPU = False
@@ -48,14 +47,9 @@ def process_video(video_path):
         print('Still going!', flush=True)
 
     desc = video_path.split('/')[-1]
-    tokens = word_tokenize(desc)
-    model = Word2Vec([tokens], size=100)
-
-    print(model.wv)
+    embedding = embed([desc])[0]
     
-    word_embeddings = [model.wv[word] for word in tokens]
-    
-    return np.array([np.array(frames), np.array(word_embeddings)])
+    return np.array([np.array(frames), np.array(embedding)])
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
