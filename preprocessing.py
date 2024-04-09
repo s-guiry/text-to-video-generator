@@ -50,6 +50,9 @@ def process_video(video_path):
     desc = video_path.split('/')[-1]
     tokens = word_tokenize(desc)
     model = Word2Vec([tokens], size=100)
+
+    print(model.wv)
+    
     word_embeddings = [model.wv[word] for word in tokens]
     
     return np.array([np.array(frames), np.array(word_embeddings)])
