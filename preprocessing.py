@@ -3,6 +3,7 @@ import os
 import cv2
 import concurrent.futures
 import gc
+import Math
 
 # Set GPU acceleration flag
 USE_GPU = False
@@ -61,7 +62,7 @@ train_dir = os.path.join(PATH, 'train')
 test_dir = os.path.join(PATH, 'test')
 val_dir = os.path.join(PATH, 'val')
 
-for INDEX in range(700 / BATCH_SIZE):
+for INDEX in range(Math.ceil(700 / BATCH_SIZE)):
     gc.collect()
     
     # get only the first BATCH_SIZE labels from INDEX
