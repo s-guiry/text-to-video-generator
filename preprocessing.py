@@ -4,6 +4,7 @@ import cv2
 import concurrent.futures
 import gc
 import math
+from multiprocessing import Pool
 
 # Set GPU acceleration flag
 USE_GPU = False
@@ -13,10 +14,9 @@ PATH = 'datasets/kinetics-dataset-main/k700-2020'
 # PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
 BATCH_SIZE = int(input(f'Enter batch size (1 to 700): '))
-# INDEX = int(input(f'Enter index (0 to {700 / BATCH_SIZE - 1} inclusive): '))
 
 # Function to read and resize videos
-def process_video(video_path, gpu):
+def process_video(video_path):
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_FPS, FPS)
     frames = []
@@ -24,7 +24,7 @@ def process_video(video_path, gpu):
         ret, frame = cap.read()
         if not ret:
             break
-        if gpu:
+        if USE_GPU:
             # Convert frame to appropriate format for GPU operations
             frame_gpu = cv2.cuda_GpuMat()
             frame_gpu.upload(frame)
@@ -46,9 +46,8 @@ def process_video(video_path, gpu):
 
 # Function to process videos in parallel
 def process_videos_parallel(video_paths):
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        resized_videos = list(executor.map(process_video, video_paths, [USE_GPU] * len(video_paths)))
-        executor.shutdown(wait=True)
+    with Pool() as pool:
+        resized_videos = pool.map(process_video, video_paths)
     
     # create a text file to indicate that the processing is done
     if len(video_paths) > 0:
