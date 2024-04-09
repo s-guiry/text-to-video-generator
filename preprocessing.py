@@ -46,8 +46,11 @@ def process_video(video_path):
         print('Still going!', flush=True)
 
     desc = video_path.split('/')[-1]
-    bert_desc = bert_embedding([desc])
-    return np.array([np.array(frames), np.array(bert_desc)])
+    tokens = word_tokenize(desc)
+    model = Word2Vec([tokens], min_count=1, size=100)
+    word_embeddings = [model.wv[word] for word in tokens]
+    
+    return np.array([np.array(frames), np.array(word_embeddings)])
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
