@@ -8,8 +8,6 @@ from multiprocessing import Pool
 from gensim.models import Word2Vec
 from nltk.tokenize import word_tokenize
 
-bert_embedding = BertEmbedding()
-
 # Set GPU acceleration flag
 USE_GPU = False
 FPS = 10
