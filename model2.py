@@ -52,9 +52,11 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
     total_loss = 0.0
     denoised_video = noisy_video  # Initialize denoised video with noisy video
     predicted_noise = tf.zeros_like(denoised_video[0])  # Initial noise prediction
+    label_data = tf.convert_to_tensor(label_data)
+    timestep = tf.convert_to_tensor(timestep)
 
     for _ in range(num_iterations):
-        predicted_noise = noise_predictor_model(denoised_video, label_data, tf.constant(timestep, dtype=tf.float32))
+        predicted_noise = noise_predictor_model(denoised_video, label_data, timestep)
         
         # take the difference between the predictions and amplify the noise
         predicted_noise = (predicted_noise - predicted_noise) * 2.0
@@ -86,7 +88,6 @@ for epoch in range(num_epochs):
         
         for batch in dataset:
             video_data = batch[0]
-            print(video_data)
             label_data = batch[1]
             true_noise = get_noise(video_data.shape, timestep=np.random.randint(1, 101))  # Generate true noise
             
