@@ -14,16 +14,8 @@ def noise_predictor(input_size, label_size, timestep_size):
     label_inputs = Input(label_size)
     timestep_inputs = Input(timestep_size)
     
-    squeezed_inputs = tf.squeeze(inputs, axis=0)
-
-    reshaped_label = tf.reshape(label_inputs, (1, 1, 1, 512))
-    reshaped_label_tiled = tf.tile(reshaped_label, [50, 224, 224, 1])
-    
-    reshaped_timestep = tf.reshape(timestep_inputs, (1, 1, 1, 1))
-    reshaped_timestep_tiled = tf.tile(reshaped_timestep, [50, 224, 224, 1])
-    
-    concatenated_input = tf.concat([reshaped_label_tiled, squeezed_inputs, reshaped_timestep_tiled], axis=3)
-    concatenated_input = tf.expand_dims(concatenated_input, axis=0)
+    # Concatenate input tensors along appropriate axis
+    concatenated_input = concatenate([inputs, label_inputs, timestep_inputs], axis=-1)
 
     # Define convolutional layers
     conv1 = Conv3D(64, 3, activation='relu', padding='same')(concatenated_input)
@@ -34,8 +26,8 @@ def noise_predictor(input_size, label_size, timestep_size):
     conv3 = Conv3D(64, 3, activation='relu', padding='same')(up1)
     
     # Output layer
-    output = Conv3D(1, 1, activation='sigmoid')(conv3)
-
+    output = Conv3D(3, 1, activation='sigmoid')(conv3)  # Assuming RGB channels
+    
     # Define and return the model
     model = tf.keras.Model(inputs=[inputs, label_inputs, timestep_inputs], outputs=output)
     return model
@@ -60,7 +52,7 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
         predicted_noise = noise_predictor_model([denoised_video, np.zeros_like(label_data), timestep])
         
         # take the difference between the predictions and amplify the noise
-        print(predicted_noise)
+        print(predicted_noise.shape)
         predicted_noise = np.abs((predicted_noise - predicted_noise_label) * 2.0)
         print(predicted_noise.shape)
         print(true_noise.shape)
