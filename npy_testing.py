@@ -13,6 +13,9 @@ def process_video(dataset):
     # print shape of the label in the first entry
     print(f'shape of label in first entry: {dataset[0][1].shape}')
     
+    # print the label in the first entry
+    print(f'label in first entry: {dataset[0][1]}')
+    
     print()
     
 ds0 = np.load('dataset_p0.npy', allow_pickle=True)
