@@ -56,10 +56,13 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
     timestep = tf.expand_dims(tf.convert_to_tensor(timestep), axis=0)
 
     for _ in range(num_iterations):
-        predicted_noise = noise_predictor_model([denoised_video, label_data, timestep])
+        predicted_noise_label = noise_predictor_model([denoised_video, label_data, timestep])
+        predicted_noise = noise_predictor_model([denoised_video, np.zeros_like(label_data), timestep])
         
         # take the difference between the predictions and amplify the noise
-        predicted_noise = (predicted_noise - predicted_noise) * 2.0
+        predicted_noise = np.abs((predicted_noise - predicted_noise_label) * 2.0)
+        print(predicted_noise.shape)
+        print(true_noise.shape)
         
         iteration_loss = tf.keras.losses.mean_squared_error(predicted_noise, true_noise)
         total_loss += tf.reduce_mean(iteration_loss)
@@ -89,10 +92,12 @@ for epoch in range(num_epochs):
         for batch in dataset:
             video_data = batch[0]
             label_data = batch[1]
-            true_noise = get_noise(video_data.shape, timestep=np.random.randint(1, 101))  # Generate true noise
+            
+            T = np.random.randint(1, 101)
+            true_noise = get_noise(video_data.shape, timestep=T)  # Generate true noise
             
             with tf.GradientTape() as tape:
-                loss = iterative_diffusion_loss(true_noise, video_data + true_noise, epoch, label_data, noise_predictor_model, reintegration_factor, num_iterations=100)
+                loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=100)
             
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
