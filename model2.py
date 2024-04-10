@@ -38,7 +38,7 @@ def noise_predictor(input_size, label_size, timestep_size):
     conv2 = Conv3D(128, 3, activation='relu', padding='same')(conv1)
     
     # Upsampling and additional convolutional layer
-    up1 = UpSampling3D(size=(1, 2, 2))(conv2)
+    up1 = UpSampling3D(size=(1, 1, 1))(conv2)
     conv3 = Conv3D(64, 3, activation='relu', padding='same')(up1)
     
     # Output layer
