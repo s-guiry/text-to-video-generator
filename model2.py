@@ -50,7 +50,7 @@ def reintegrate_noise(denoised_video, predicted_noise, reintegration_factor):
 
 def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, noise_predictor_model, reintegration_factor, num_iterations):
     total_loss = 0.0
-    denoised_video = noisy_video  # Initialize denoised video with noisy video
+    denoised_video = tf.expand_dims(noisy_video, axis=0)  # Initialize denoised video with noisy video
     predicted_noise = tf.zeros_like(denoised_video[0])  # Initial noise prediction
     label_data = tf.expand_dims(tf.convert_to_tensor(label_data), axis=0)
     timestep = tf.expand_dims(tf.convert_to_tensor(timestep), axis=0)
