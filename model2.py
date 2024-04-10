@@ -56,7 +56,7 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
     timestep = tf.convert_to_tensor(timestep)
 
     for _ in range(num_iterations):
-        predicted_noise = noise_predictor_model(denoised_video, label_data, timestep)
+        predicted_noise = noise_predictor_model([denoised_video, label_data, timestep])
         
         # take the difference between the predictions and amplify the noise
         predicted_noise = (predicted_noise - predicted_noise) * 2.0
