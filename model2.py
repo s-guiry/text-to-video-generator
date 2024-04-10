@@ -11,21 +11,23 @@ def get_noise(shape, timestep, mean=0, base_std=1):
 
 from keras.layers import Reshape
 
+from keras.layers import Reshape
+
 def noise_predictor(input_size, label_size, timestep_size):
     inputs = Input(input_size)
     label_inputs = Input(label_size)
     timestep_inputs = Input(timestep_size)
     
     # Reshape label_inputs to match the spatial dimensions of inputs
-    reshaped_label = Reshape((1, 1, 1, label_size[0]))(label_inputs)
-    tiled_label = tf.tile(reshaped_label, [1, input_size[1], input_size[2], input_size[3], 1])
+    label_reshaped = Reshape((1, 1, 1, label_size[0]))(label_inputs)
+    label_tiled = tf.tile(label_reshaped, [input_size[0], input_size[1], input_size[2], input_size[3], 1])
     
     # Reshape timestep_inputs to match the spatial dimensions of inputs
-    reshaped_timestep = Reshape((1, 1, 1, timestep_size[0]))(timestep_inputs)
-    tiled_timestep = tf.tile(reshaped_timestep, [1, input_size[1], input_size[2], input_size[3], 1])
+    timestep_reshaped = Reshape((1, 1, 1, timestep_size[0]))(timestep_inputs)
+    timestep_tiled = tf.tile(timestep_reshaped, [input_size[0], input_size[1], input_size[2], input_size[3], 1])
     
-    # Concatenate input tensors along appropriate axis
-    concatenated_input = concatenate([inputs, tiled_label, tiled_timestep], axis=-1)
+    # Concatenate input tensors along the last axis
+    concatenated_input = concatenate([inputs, label_tiled, timestep_tiled], axis=-1)
 
     # Define convolutional layers
     conv1 = Conv3D(64, 3, activation='relu', padding='same')(concatenated_input)
