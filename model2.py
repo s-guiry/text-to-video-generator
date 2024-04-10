@@ -15,13 +15,13 @@ def noise_predictor(input_shape, label_shape, timestep_shape):
     label_inputs = Input(label_shape)
     timestep_inputs = Input(timestep_shape)
 
-    # Reshape label_inputs to (1, 1, 1, 1, 512) to match the expected rank-5 tensor
-    label_reshaped = tf.reshape(label_inputs, (1, 1, 1, 1, 512))
-
-    # Reshape timestep_inputs to (1, 1, 1, 1, 1) to match the rank-5 tensor
-    timestep_reshaped = tf.expand_dims(tf.expand_dims(tf.expand_dims(timestep_inputs, axis=0), axis=0), axis=0)
-    # Concatenate inputs along axis -1
-    concatenated_input = tf.concat([inputs, label_reshaped, timestep_reshaped], axis=-1)
+    reshaped_label = tf.reshape(label_inputs, (1, 1, 1, 512))
+    reshaped_label_tiled = tf.tile(reshaped_label, [50, 224, 224, 1])
+    
+    reshaped_timestep = tf.reshape(timestep_inputs, (1, 1, 1, 1))
+    reshaped_timestep_tiled = tf.tile(reshaped_timestep, [50, 224, 224, 1])
+    
+    concatenated_input = tf.concat([reshaped_label_tiled, inputs, reshaped_timestep_tiled], axis=3)
 
     # Define convolutional layers
     conv1 = Conv3D(64, 3, activation='relu', padding='same')(concatenated_input)
