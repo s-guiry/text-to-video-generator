@@ -68,10 +68,7 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
         predicted_noise = noise_predictor_model([denoised_video, np.zeros_like(label_data), timestep])
         
         # take the difference between the predictions and amplify the noise
-        print(predicted_noise.shape)
         predicted_noise = np.abs((predicted_noise - predicted_noise_label) * 2.0)
-        print(predicted_noise.shape)
-        print(true_noise.shape)
         
         iteration_loss = tf.keras.losses.mean_squared_error(predicted_noise, true_noise)
         total_loss += tf.reduce_mean(iteration_loss)
@@ -91,10 +88,10 @@ optimizer = tf.keras.optimizers.Adam()
 num_epochs = 100
 reintegration_factor = 0.9
 for epoch in range(num_epochs):
-    print(f'On epoch {epoch}')
+    print(f'On epoch {epoch}', flush=True)
     
     for i in range(100):
-        print(i)
+        print(f'On epoch {i}', flush=True)
         
         dataset = np.load(f'dataset_p{i}.npy', allow_pickle=True)
         
@@ -111,7 +108,7 @@ for epoch in range(num_epochs):
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
             
-    print(f'Epoch {epoch} loss: {loss}\n')
+    print(f'Epoch {epoch} loss: {loss}\n', flush=True)
         
 noise_predictor_model.save('noise_predictor_model.h5')
-print('Done training!')
+print('Done training!', flush=True)
