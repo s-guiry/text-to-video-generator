@@ -9,12 +9,7 @@ def get_noise(shape, timestep, mean=0, base_std=1):
     noise = np.random.normal(mean, std, shape)
     return noise
 
-def noise_predictor(input_shape, label_shape, timestep_shape):
-    # Define input layers
-    inputs = Input(input_shape)
-    label_inputs = Input(label_shape)
-    timestep_inputs = Input(timestep_shape)
-
+def noise_predictor(inputs, label_inputs, timestep_inputs):
     squeezed_inputs = tf.squeeze(inputs, axis=0)
 
     reshaped_label = tf.reshape(label_inputs, (1, 1, 1, 512))
@@ -55,13 +50,10 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
     predicted_noise = tf.zeros_like(denoised_video[0])  # Initial noise prediction
 
     for _ in range(num_iterations):
-        predicted_noise_label = noise_predictor_model(denoised_video, label_data, tf.constant(timestep, dtype=tf.float32))
-        
-        input_data = tf.concat([denoised_video, tf.expand_dims(np.zeros_like(label_data), axis=0), tf.expand_dims(tf.constant(timestep, dtype=tf.float32), axis=0)], axis=-1)
-        predicted_noise = noise_predictor_model(input_data)
+        predicted_noise = noise_predictor_model(denoised_video, label_data, tf.constant(timestep, dtype=tf.float32))
         
         # take the difference between the predictions and amplify the noise
-        predicted_noise = (predicted_noise - predicted_noise_label) * 2.0
+        predicted_noise = (predicted_noise - predicted_noise) * 2.0
         
         iteration_loss = tf.keras.losses.mean_squared_error(predicted_noise, true_noise)
         total_loss += tf.reduce_mean(iteration_loss)
