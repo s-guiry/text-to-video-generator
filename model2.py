@@ -15,9 +15,13 @@ def noise_predictor(input_shape, label_shape, timestep_shape):
     label_inputs = Input(label_shape)
     timestep_inputs = Input(timestep_shape)
 
-    # Reshape label_inputs and timestep_inputs to match input_shape
-    label_reshaped = tf.keras.layers.Reshape(input_shape[1:] + (label_shape[-1],))(label_inputs)
-    timestep_reshaped = tf.keras.layers.Reshape(input_shape[1:] + (timestep_shape[-1],))(timestep_inputs)
+    # Reshape label_inputs to match spatial dimensions of the video input
+    label_reshaped = tf.keras.layers.Dense(np.prod(input_shape[1:]))(label_inputs)
+    label_reshaped = tf.keras.layers.Reshape(input_shape[1:] + (1,))(label_reshaped)
+
+    # Reshape timestep_inputs to match spatial dimensions of the video input
+    timestep_reshaped = tf.keras.layers.Dense(np.prod(input_shape[1:]))(timestep_inputs)
+    timestep_reshaped = tf.keras.layers.Reshape(input_shape[1:] + (1,))(timestep_reshaped)
 
     # Concatenate inputs along axis -1
     concatenated_input = concatenate([inputs, label_reshaped, timestep_reshaped], axis=-1)
