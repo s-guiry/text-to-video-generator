@@ -4,7 +4,6 @@ import cv2
 import concurrent.futures
 import gc
 import math
-from multiprocessing import Pool
 import tensorflow as tf
 import tensorflow_hub as hub
 
@@ -53,8 +52,8 @@ def process_video(video_path):
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
-    with Pool() as pool:
-        resized_videos = pool.map(process_video, batch)
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        resized_videos = list(executor.map(process_video, batch))
     return resized_videos
 
 # Function to process videos in batches
