@@ -106,20 +106,29 @@ for epoch in range(num_epochs):
     # Training loop
     for dataset in datasets:
         if dataset is None:
+            print('dataset is none', flush=True)
             continue
         
         for batch in dataset:
             video_data = batch[0]
             label_data = batch[1]
             
+            print('got data', flush=True)
+            
             T = np.random.randint(1, 101)
             true_noise = get_noise(video_data.shape, timestep=T)  # Generate true noise
+            
+            print('generated noise', flush=True)
             
             with tf.GradientTape() as tape:
                 loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=100)
             
+            print('calculated loss', flush=True)
+            
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
+            
+            print('applied gradients', flush=True)
             
             if np.random.randint(10) == 5:
                 print('Still going!', flush=True)
