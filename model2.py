@@ -101,8 +101,12 @@ for epoch in range(num_epochs):
             video_data = batch[0]
             label_data = batch[1]
             
+            print('got labels', flush=True)
+            
             T = np.random.randint(1, 101)
             true_noise = get_noise(video_data.shape, timestep=T)  # Generate true noise
+            
+            print('generated noise', flush=True)
             
             with tf.GradientTape() as tape:
                 loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=100)
@@ -114,6 +118,10 @@ for epoch in range(num_epochs):
                 print(f'On batch {batch}', flush=True)
                 
             c += 1
+            
+            break # temp
+        
+        break # temp
                         
     print(f'Epoch {epoch} loss: {loss}\n', flush=True)
         
