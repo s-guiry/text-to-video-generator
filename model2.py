@@ -60,6 +60,7 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
         predicted_noise = noise_predictor_model([denoised_video, np.zeros_like(label_data), timestep])
         
         # take the difference between the predictions and amplify the noise
+        print(predicted_noise)
         predicted_noise = np.abs((predicted_noise - predicted_noise_label) * 2.0)
         print(predicted_noise.shape)
         print(true_noise.shape)
