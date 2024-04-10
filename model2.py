@@ -13,18 +13,22 @@ from keras.layers import Reshape
 
 from keras.layers import Reshape
 
+from keras.layers import Reshape, Permute
+
 def noise_predictor(input_size, label_size, timestep_size):
     inputs = Input(input_size)
     label_inputs = Input(label_size)
     timestep_inputs = Input(timestep_size)
     
-    # Reshape label_inputs to match the spatial dimensions of inputs
-    label_reshaped = Reshape((1, 1, 1, label_size[0]))(label_inputs)
-    label_tiled = tf.tile(label_reshaped, [input_size[0], input_size[1], input_size[2], input_size[3], 1])
+    # Reshape and permute label_inputs to match the spatial dimensions of inputs
+    label_reshaped = Reshape((1, 1, label_size[0], 1))(label_inputs)
+    label_permuted = Permute((4, 1, 2, 3))(label_reshaped)
+    label_tiled = tf.tile(label_permuted, [input_size[0], 1, input_size[1], input_size[2], 1])
     
-    # Reshape timestep_inputs to match the spatial dimensions of inputs
-    timestep_reshaped = Reshape((1, 1, 1, timestep_size[0]))(timestep_inputs)
-    timestep_tiled = tf.tile(timestep_reshaped, [input_size[0], input_size[1], input_size[2], input_size[3], 1])
+    # Reshape and permute timestep_inputs to match the spatial dimensions of inputs
+    timestep_reshaped = Reshape((1, 1, timestep_size[0], 1))(timestep_inputs)
+    timestep_permuted = Permute((4, 1, 2, 3))(timestep_reshaped)
+    timestep_tiled = tf.tile(timestep_permuted, [input_size[0], 1, input_size[1], input_size[2], 1])
     
     # Concatenate input tensors along the last axis
     concatenated_input = concatenate([inputs, label_tiled, timestep_tiled], axis=-1)
