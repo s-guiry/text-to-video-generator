@@ -42,7 +42,9 @@ def process_video(video_path):
     if np.random.randint(1, 501) == 20:
         print('Still going!', flush=True)
     
-    return np.array([np.array(frames), video_path.split('/')[-1]])
+    label = video_path.split('/')[-1]
+
+    return np.array(frames), label
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
@@ -77,17 +79,18 @@ i = 0
 for batch in process_videos_in_batches(files, BATCH_SIZE):
     gc.collect()
     
-    dataset = np.array(process_batch_parallel(batch))
-    
+    dataset = process_batch_parallel(batch)
+    dataset_array = np.array([(frames, label) for frames, label in dataset], dtype=object)
+
     # Save dataset
-    np.save(f'dataset_p{i}.npy', dataset)
+    np.save(f'dataset_p{i}.npy', dataset_array)
     
     # load dataset.npy
     # ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
     
     print(f'Done with index {i}')
-    print(dataset.shape)
-    print(dataset[0].shape)
+    # print(dataset.shape)
+    # print(dataset[0].shape)
     print()
 
     i += 1
