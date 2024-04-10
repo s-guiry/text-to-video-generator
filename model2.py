@@ -41,7 +41,7 @@ def noise_predictor(input_size, label_size, timestep_size):
     up1 = UpSampling3D(size=(1, 1, 1))(conv2)
     conv3 = Conv3D(64, 3, activation='relu', padding='same')(up1)
     
-    # Output layer
+    # Output layer 
     output = Conv3D(3, 1, activation='sigmoid')(conv3)  # Assuming RGB channels
     
     # Define and return the model
