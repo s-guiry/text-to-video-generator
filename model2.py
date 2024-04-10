@@ -23,7 +23,7 @@ def noise_predictor(input_size, label_size, timestep_size):
     # Reshape and permute label_inputs to match the spatial dimensions of inputs
     label_reshaped = Reshape((1, 1, label_size[0], 1))(label_inputs)
     label_permuted = Permute((4, 1, 2, 3))(label_reshaped)
-    label_tiled = tf.tile(label_permuted, [input_size[0], 1, input_size[1], input_size[2], 3])
+    label_tiled = tf.tile(label_permuted, [input_size[0], 1, input_size[1], input_size[2], 1])
     
     # Reshape and permute timestep_inputs to match the spatial dimensions of inputs
     timestep_reshaped = Reshape((1, 1, timestep_size[0], 1))(timestep_inputs)
