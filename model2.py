@@ -3,7 +3,6 @@ import tensorflow as tf
 from keras.layers import Input, Conv3D, concatenate, UpSampling3D
 from keras.layers import Reshape, Permute
 import threading
-from tqdm import tqdm
 
 VIDEO_SHAPE = (224, 224)
 
@@ -89,7 +88,9 @@ reintegration_factor = 0.9
 def load_dataset(dataset, idx):
     dataset[idx] = np.load(f'dataset_p{idx}.npy', allow_pickle=True)
 
-for epoch in tqdm(range(num_epochs), desc='Epochs'):
+for epoch in range(num_epochs):
+    print(f'On epoch {epoch}', flush=True)
+    
     # Initialize dataset list for storing loaded datasets
     datasets = [None] * 100
     
@@ -103,11 +104,11 @@ for epoch in tqdm(range(num_epochs), desc='Epochs'):
         t.join()
     
     # Training loop
-    for dataset in tqdm(datasets, desc='Datasets', leave=False):
+    for dataset in datasets:
         if dataset is None:
             continue
         
-        for batch in tqdm(dataset, desc='Batches', leave=False):
+        for batch in dataset:
             video_data = batch[0]
             label_data = batch[1]
             
@@ -120,4 +121,15 @@ for epoch in tqdm(range(num_epochs), desc='Epochs'):
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
             
+            if np.random.randint(10) == 5:
+                print('Still going!', flush=True)
+                
+            break # temp
+        
+        break # temp
+                        
+    print(f'Epoch {epoch} loss: {loss}\n', flush=True)
+        
+# Save the trained model
+noise_predictor_model.save('noise_predictor_model.h5')
 print('Done training!', flush=True)
