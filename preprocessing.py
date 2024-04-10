@@ -6,11 +6,6 @@ import gc
 import math
 import tensorflow as tf
 import tensorflow_hub as hub
-<<<<<<< HEAD
-
-embed = hub.load('https://tfhub.dev/google/universal-sentence-encoder/4')
-=======
->>>>>>> c2dcb56af5020a03dd8316d95ec880aac149de10
 
 # Set GPU acceleration flag
 USE_GPU = False
@@ -50,9 +45,6 @@ def process_video(video_path):
     
     if np.random.randint(1, 501) == 20:
         print('Still going!', flush=True)
-
-    desc = video_path.split('/')[-1]
-    embedding = embed([desc])[0]
     
     label = video_path.split('/')[-1]
 
@@ -72,16 +64,19 @@ def process_videos_in_batches(video_paths, batch_size):
 
 # Paths
 train_dir = os.path.join(PATH, 'train')
+test_dir = os.path.join(PATH, 'test')
 val_dir = os.path.join(PATH, 'val')
 
 # get only the first BATCH_SIZE labels from INDEX
 train_labels = [folder for folder in os.listdir(train_dir)]
+test_labels = [folder for folder in os.listdir(test_dir)]
 val_labels = [folder for folder in os.listdir(val_dir)]
 
 # Get list of video files using the labels
 train_files = [os.path.join(train_dir, folder, file) for folder in train_labels for file in os.listdir(os.path.join(train_dir, folder))]
+test_files = [os.path.join(test_dir, folder, file) for folder in test_labels for file in os.listdir(os.path.join(test_dir, folder))]
 val_files = [os.path.join(val_dir, folder, file) for folder in val_labels for file in os.listdir(os.path.join(val_dir, folder))]
-files = train_files + val_files
+files = train_files + test_files + val_files
     
 # Process videos in batches
 i = 0
