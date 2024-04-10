@@ -9,7 +9,11 @@ def get_noise(shape, timestep, mean=0, base_std=1):
     noise = np.random.normal(mean, std, shape)
     return noise
 
-def noise_predictor(inputs, label_inputs, timestep_inputs):
+def noise_predictor(input_size, label_size, timestep_size):
+    inputs = Input(input_size)
+    label_inputs = Input(label_size)
+    timestep_inputs = Input(timestep_size)
+    
     squeezed_inputs = tf.squeeze(inputs, axis=0)
 
     reshaped_label = tf.reshape(label_inputs, (1, 1, 1, 512))
