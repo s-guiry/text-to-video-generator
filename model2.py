@@ -87,6 +87,7 @@ optimizer = tf.keras.optimizers.Adam()
 # Train the model
 num_epochs = 100
 reintegration_factor = 0.9
+
 for epoch in range(num_epochs):
     print(f'On epoch {epoch}', flush=True)
     
@@ -95,6 +96,7 @@ for epoch in range(num_epochs):
         
         dataset = np.load(f'dataset_p{i}.npy', allow_pickle=True)
         
+        c = 0
         for batch in dataset:
             video_data = batch[0]
             label_data = batch[1]
@@ -108,9 +110,11 @@ for epoch in range(num_epochs):
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
             
-            if np.random.randint(0, 500) == 20:
-                print('Still going!', flush=True)
-            
+            if c % 10 == 0:
+                print(f'On batch {batch}', flush=True)
+                
+            c += 1
+                        
     print(f'Epoch {epoch} loss: {loss}\n', flush=True)
         
 noise_predictor_model.save('noise_predictor_model.h5')
