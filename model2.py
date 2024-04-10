@@ -1,6 +1,8 @@
 import numpy as np
 import tensorflow as tf
 from keras.layers import Input, Conv3D, concatenate, UpSampling3D
+from keras.layers import Reshape, Permute
+import threading
 
 VIDEO_SHAPE = (224, 224)
 
@@ -8,12 +10,6 @@ def get_noise(shape, timestep, mean=0, base_std=1):
     std = base_std * np.sqrt(timestep)
     noise = np.random.normal(mean, std, shape)
     return noise
-
-from keras.layers import Reshape
-
-from keras.layers import Reshape
-
-from keras.layers import Reshape, Permute
 
 def noise_predictor(input_size, label_size, timestep_size):
     inputs = Input(input_size)
@@ -88,15 +84,30 @@ optimizer = tf.keras.optimizers.Adam()
 num_epochs = 100
 reintegration_factor = 0.9
 
+# Define function for threaded dataset loading
+def load_dataset(dataset, idx):
+    dataset[idx] = np.load(f'dataset_p{idx}.npy', allow_pickle=True)
+
 for epoch in range(num_epochs):
     print(f'On epoch {epoch}', flush=True)
     
-    for i in range(100):
-        print(f'On epoch {i}', flush=True)
+    # Initialize dataset list for storing loaded datasets
+    datasets = [None] * 100
+    
+    # Initialize threads for loading datasets
+    threads = [threading.Thread(target=load_dataset, args=(datasets, i)) for i in range(100)]
+    
+    # Start and join all threads for loading datasets
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    
+    # Training loop
+    for dataset in datasets:
+        if dataset is None:
+            continue
         
-        dataset = np.load(f'dataset_p{i}.npy', allow_pickle=True)
-        
-        c = 0
         for batch in dataset:
             video_data = batch[0]
             label_data = batch[1]
@@ -110,12 +121,11 @@ for epoch in range(num_epochs):
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
             
-            if c % 10 == 0:
-                print(f'On batch {batch}', flush=True)
-                
-            c += 1
+            if np.random.randint(10) == 5:
+                print('Still going!', flush=True)
                         
     print(f'Epoch {epoch} loss: {loss}\n', flush=True)
         
+# Save the trained model
 noise_predictor_model.save('noise_predictor_model.h5')
 print('Done training!', flush=True)
