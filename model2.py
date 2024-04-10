@@ -55,8 +55,7 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
     predicted_noise = tf.zeros_like(denoised_video[0])  # Initial noise prediction
 
     for _ in range(num_iterations):
-        input_data_label = tf.concat([denoised_video, tf.expand_dims(label_data, axis=0), tf.expand_dims(tf.constant(timestep, dtype=tf.float32), axis=0)], axis=-1)
-        predicted_noise_label = noise_predictor_model(input_data_label)
+        predicted_noise_label = noise_predictor_model(denoised_video, label_data, tf.constant(timestep, dtype=tf.float32))
         
         input_data = tf.concat([denoised_video, tf.expand_dims(np.zeros_like(label_data), axis=0), tf.expand_dims(tf.constant(timestep, dtype=tf.float32), axis=0)], axis=-1)
         predicted_noise = noise_predictor_model(input_data)
