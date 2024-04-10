@@ -10,20 +10,30 @@ def get_noise(shape, timestep, mean=0, base_std=1):
     return noise
 
 def noise_predictor(input_shape, label_shape, timestep_shape):
+    # Define input layers
     inputs = Input(input_shape)
     label_inputs = Input(label_shape)
     timestep_inputs = Input(timestep_shape)
 
-    concatenated_input = concatenate([inputs, label_inputs, timestep_inputs], axis=-1)
+    # Expand dimensions if needed
+    label_expanded = tf.expand_dims(label_inputs, axis=1)
+    timestep_expanded = tf.expand_dims(timestep_inputs, axis=1)
 
+    # Concatenate inputs along axis 1
+    concatenated_input = concatenate([inputs, label_expanded, timestep_expanded], axis=1)
+
+    # Define convolutional layers
     conv1 = Conv3D(64, 3, activation='relu', padding='same')(concatenated_input)
     conv2 = Conv3D(128, 3, activation='relu', padding='same')(conv1)
     
+    # Upsampling and additional convolutional layer
     up1 = UpSampling3D(size=(2, 2, 2))(conv2)
     conv3 = Conv3D(64, 3, activation='relu', padding='same')(up1)
     
+    # Output layer
     output = Conv3D(1, 1, activation='sigmoid')(conv3)
 
+    # Define and return the model
     model = tf.keras.Model(inputs=[inputs, label_inputs, timestep_inputs], outputs=output)
     return model
 
@@ -68,7 +78,7 @@ optimizer = tf.keras.optimizers.Adam()
 num_epochs = 100
 reintegration_factor = 0.9
 for epoch in range(num_epochs):
-    print(epoch)
+    print(f'On epoch {epoch}')
     
     for i in range(100):
         print(i)
@@ -86,7 +96,7 @@ for epoch in range(num_epochs):
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
             
-    print(f'Epoch {epoch} loss: {loss}')
+    print(f'Epoch {epoch} loss: {loss}\n')
         
 noise_predictor_model.save('noise_predictor_model.h5')
 print('Done training!')
