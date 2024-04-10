@@ -1,9 +1,13 @@
 import tensorflow as tf
+import numpy as np
 
-# Assuming your tensors are TensorFlow tensors
 label_inputs = tf.random.normal((512,))  # Example (512,) tensor
-inputs = tf.random.normal((, 50, 224, 224, 3))  # Example (50, 224, 224, 3) tensor
+
+# create a tensor with shape (None, 50, 224, 224, 3)
+inputs = tf.random.normal((None, 50, 224, 224, 3))  # Example (None, 50, 224, 224, 3) tensor
 timestep_inputs = tf.random.normal((1,))  # Example (1,) tensor
+
+print(inputs.shape)
 
 reshaped_label = tf.reshape(label_inputs, (1, 1, 1, 512))
 reshaped_label_tiled = tf.tile(reshaped_label, [50, 224, 224, 1])
