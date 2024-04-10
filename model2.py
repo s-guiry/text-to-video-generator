@@ -108,6 +108,9 @@ for epoch in range(num_epochs):
             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
             
+            if np.random.randint(0, 500) == 20:
+                print('Still going!', flush=True)
+            
     print(f'Epoch {epoch} loss: {loss}\n', flush=True)
         
 noise_predictor_model.save('noise_predictor_model.h5')
