@@ -15,12 +15,12 @@ def noise_predictor(input_shape, label_shape, timestep_shape):
     label_inputs = Input(label_shape)
     timestep_inputs = Input(timestep_shape)
 
-    # Expand dimensions if needed
-    label_expanded = tf.expand_dims(label_inputs, axis=1)
-    timestep_expanded = tf.expand_dims(timestep_inputs, axis=1)
+    # Reshape label_inputs and timestep_inputs to match input_shape
+    label_reshaped = tf.keras.layers.Reshape(input_shape[1:] + (label_shape[-1],))(label_inputs)
+    timestep_reshaped = tf.keras.layers.Reshape(input_shape[1:] + (timestep_shape[-1],))(timestep_inputs)
 
-    # Concatenate inputs along axis 1
-    concatenated_input = concatenate([inputs, label_expanded, timestep_expanded], axis=1)
+    # Concatenate inputs along axis -1
+    concatenated_input = concatenate([inputs, label_reshaped, timestep_reshaped], axis=-1)
 
     # Define convolutional layers
     conv1 = Conv3D(64, 3, activation='relu', padding='same')(concatenated_input)
