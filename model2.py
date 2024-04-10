@@ -87,7 +87,7 @@ for epoch in range(num_epochs):
     for i in range(100):
         print(i)
         
-        dataset = np.load(f'dataset_p{i}.npy')
+        dataset = np.load(f'dataset_p{i}.npy', allow_pickle=True)
         
         for batch in dataset:
             video_data = batch[0]
