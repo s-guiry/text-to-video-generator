@@ -2,13 +2,16 @@ import numpy as np
 
 def process_video(dataset):
     # print the shape of the dataset
-    print(dataset.shape)
-
-    # print the shape of the video
-    print(dataset[0].shape)
-
-    # print the shape of the label
-    print(dataset[1].shape)
+    print(f'dataset shape: {dataset.shape}')
+    
+    # print shape of the first entry
+    print(f'shape of first entry: {dataset[0].shape}')
+    
+    # print shape of the video in the first entry
+    print(f'shape of video in first entry: {dataset[0][0].shape}')
+    
+    # print shape of the label in the first entry
+    print(f'shape of label in first entry: {dataset[0][1].shape}')
     
     print()
     

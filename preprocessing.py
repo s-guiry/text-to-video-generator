@@ -54,13 +54,9 @@ def process_video(video_path):
     desc = video_path.split('/')[-1]
     embedding = embed([desc])[0]
     
-<<<<<<< HEAD
-    return np.array([np.array(frames), np.array(embedding)])
-=======
     label = video_path.split('/')[-1]
 
     return np.array(frames), label
->>>>>>> c2dcb56af5020a03dd8316d95ec880aac149de10
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
@@ -109,10 +105,5 @@ for batch in process_videos_in_batches(files, BATCH_SIZE):
 
     i += 1
 
-<<<<<<< HEAD
-    if i * BATCH_SIZE >= 100000:
-        break
-=======
     if i * BATCH_SIZE >= 3:
         break
->>>>>>> c2dcb56af5020a03dd8316d95ec880aac149de10
