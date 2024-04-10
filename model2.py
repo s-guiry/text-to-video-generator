@@ -52,7 +52,7 @@ def subtract_noise(video_data, predicted_noise):
     denoised_video = video_data - predicted_noise
     return denoised_video
 
-def reintegrate_noise(denoised_video, predicted_noise, reintegration_factor):
+def reintegrate_noise(denoised_video, predicted_noise, reintegaration_factor):
     reintegrated_video = denoised_video + reintegration_factor * predicted_noise
     return reintegrated_video
 
@@ -137,7 +137,7 @@ print('generated noise', flush=True)
 
 with tf.GradientTape() as tape:
     print('time for loss', flush=True)
-    loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=100)
+    loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=1)
 print('get gradients', flush=True)
 gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
 print('apply gradients', flush=True)
