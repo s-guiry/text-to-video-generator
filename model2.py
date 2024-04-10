@@ -24,6 +24,7 @@ def noise_predictor(input_shape, label_shape, timestep_shape):
     reshaped_timestep_tiled = tf.tile(reshaped_timestep, [50, 224, 224, 1])
     
     concatenated_input = tf.concat([reshaped_label_tiled, squeezed_inputs, reshaped_timestep_tiled], axis=3)
+    concatenated_input = tf.expand_dims(concatenated_input, axis=0)
 
     # Define convolutional layers
     conv1 = Conv3D(64, 3, activation='relu', padding='same')(concatenated_input)
