@@ -121,23 +121,24 @@ model = UNet().cuda()
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# create the DataLoader
-dataloader = DataLoader(VideoDataset(ds), batch_size=batch_size, shuffle=True)
+for ds in range(100):
+    # create the DataLoader
+    dataloader = DataLoader(VideoDataset(ds), batch_size=batch_size, shuffle=True)
 
-for epoch in range(num_epochs):
-    for i, (videos, labels) in enumerate(dataloader):
-        videos = videos.cuda()
-        labels = labels.cuda()
-        
-        outputs = model(videos, T)
-        loss = criterion(outputs, videos)
-        
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        
-        if (i + 1) % 100 == 0:
-            print(f'Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{len(dataloader)}], Loss: {loss.item()}')
+    for epoch in range(num_epochs):
+        for i, (videos, labels) in enumerate(dataloader):
+            videos = videos.cuda()
+            labels = labels.cuda()
+            
+            outputs = model(videos, T)
+            loss = criterion(outputs, videos)
+            
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            
+            if (i + 1) % 100 == 0:
+                print(f'Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{len(dataloader)}], Loss: {loss.item()}')
 
 # save the model
 torch.save(model.state_dict(), 'model.pth')
