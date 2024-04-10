@@ -83,6 +83,7 @@ for epoch in range(num_epochs):
         
         for batch in dataset:
             video_data = batch[0]
+            print(video_data)
             label_data = batch[1]
             true_noise = get_noise(video_data.shape, timestep=np.random.randint(1, 101))  # Generate true noise
             
