@@ -100,5 +100,5 @@ for batch in process_videos_in_batches(files, BATCH_SIZE):
 
     i += 1
 
-    if i * BATCH_SIZE >= 3:
+    if i * BATCH_SIZE >= 100000:
         break
