@@ -15,15 +15,17 @@ def noise_predictor(input_shape, label_shape, timestep_shape):
     label_inputs = Input(label_shape)
     timestep_inputs = Input(timestep_shape)
 
+    squeezed_inputs = tf.squeeze(inputs, axis=0)
+
     reshaped_label = tf.reshape(label_inputs, (1, 1, 1, 512))
-    reshaped_label_tiled = tf.tile(reshaped_label, [50, 224, 224, 3])
+    reshaped_label_tiled = tf.tile(reshaped_label, [50, 224, 224, 1])
     reshaped_label_exp = tf.expand_dims(reshaped_label_tiled, axis=0)
     
     reshaped_timestep = tf.reshape(timestep_inputs, (1, 1, 1, 1))
-    reshaped_timestep_tiled = tf.tile(reshaped_timestep, [50, 224, 224, 3])
+    reshaped_timestep_tiled = tf.tile(reshaped_timestep, [50, 224, 224, 1])
     reshaped_timestep_exp = tf.expand_dims(reshaped_timestep_tiled, axis=0)
     
-    concatenated_input = tf.concat([reshaped_label_exp, inputs, reshaped_timestep_exp], axis=3)
+    concatenated_input = tf.concat([reshaped_label_exp, squeezed_inputs, reshaped_timestep_exp], axis=3)
 
     # Define convolutional layers
     conv1 = Conv3D(64, 3, activation='relu', padding='same')(concatenated_input)
