@@ -4,7 +4,8 @@ import cv2
 import concurrent.futures
 import gc
 import math
-from multiprocessing import Pool
+import tensorflow as tf
+import tensorflow_hub as hub
 
 # Set GPU acceleration flag
 USE_GPU = False
@@ -14,6 +15,9 @@ PATH = 'datasets/kinetics-dataset-main/k700-2020'
 # PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
 BATCH_SIZE = int(input(f'Enter batch size (1 to 700): '))
+
+# Load Universal Sentence Encoder model from TensorFlow Hub
+embed = hub.load('https://tfhub.dev/google/universal-sentence-encoder/4')
 
 # Function to read and resize videos
 def process_video(video_path):
@@ -48,8 +52,8 @@ def process_video(video_path):
 
 # Function to process videos in parallel for a single batch
 def process_batch_parallel(batch):
-    with Pool() as pool:
-        resized_videos = pool.map(process_video, batch)
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        resized_videos = list(executor.map(process_video, batch))
     return resized_videos
 
 # Function to process videos in batches
@@ -80,17 +84,18 @@ for batch in process_videos_in_batches(files, BATCH_SIZE):
     gc.collect()
     
     dataset = process_batch_parallel(batch)
-    dataset_array = np.array([(frames, label) for frames, label in dataset], dtype=object)
+    dataset_embedded = []
+    for frames, label in dataset:
+        # Embed the label using Universal Sentence Encoder
+        embedding = embed([label])[0]
+        dataset_embedded.append((frames, embedding))
+    
+    dataset_array = np.array(dataset_embedded, dtype=object)
 
     # Save dataset
     np.save(f'dataset_p{i}.npy', dataset_array)
     
-    # load dataset.npy
-    # ds = np.load(f'dataset_p{INDEX}.npy', allow_pickle=True)
-    
     print(f'Done with index {i}')
-    # print(dataset.shape)
-    # print(dataset[0].shape)
     print()
 
     i += 1
