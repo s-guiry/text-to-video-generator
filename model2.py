@@ -17,16 +17,16 @@ def noise_predictor(input_shape, label_shape, timestep_shape):
 
     # input_reshaped = [inputs[1], inputs[2], inputs[3], inputs[0]]
 
-    # Reshape label_inputs to match spatial dimensions of the input_shape so that it can be concatenated
+    # Reshape label_inputs to match spatial dimensions of the input_shape
     label_reshaped = tf.keras.layers.Reshape((1, 1, 1, label_shape[0]))(label_inputs)
     label_reshaped = tf.tile(label_reshaped, [1, input_shape[1], input_shape[2], input_shape[3], 1])
     
-    # Reshape timestep_inputs to match spatial dimensions of the input_shape so that it can be concatenated
+    # Reshape timestep_inputs to match spatial dimensions of the input_shape
     timestep_reshaped = tf.keras.layers.Reshape((1, 1, 1, timestep_shape[0]))(timestep_inputs)
     timestep_reshaped = tf.tile(timestep_reshaped, [1, input_shape[1], input_shape[2], input_shape[3], 1])
 
     input_reshaped = [inputs] + [label_reshaped] + [timestep_reshaped]
-    concatenated_input = concatenate(input_reshaped, axis=-1)
+    concatenated_input = concatenate([inputs, label_reshaped, timestep_reshaped], axis=-1)
 
     # Concatenate inputs along axis -1
     # concatenated_input = concatenate([input_reshaped, label_reshaped, timestep_reshaped], axis=-1)
