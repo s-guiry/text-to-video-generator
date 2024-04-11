@@ -9,10 +9,6 @@ def get_noise(shape, timestep, mean=0, base_std=1):
     noise = np.random.normal(mean, std, shape)
     return noise
 
-from keras.layers import Reshape
-
-from keras.layers import Reshape
-
 from keras.layers import Reshape, Permute
 
 def noise_predictor(input_size, label_size, timestep_size):
@@ -64,16 +60,21 @@ def iterative_diffusion_loss(true_noise, noisy_video, timestep, label_data, nois
     timestep = tf.expand_dims(tf.convert_to_tensor(timestep), axis=0)
 
     for _ in range(num_iterations):
-        predicted_noise_label = noise_predictor_model([denoised_video, label_data, timestep])
-        predicted_noise = noise_predictor_model([denoised_video, np.zeros_like(label_data), timestep])
-        
-        # take the difference between the predictions and amplify the noise
-        predicted_noise = np.abs((predicted_noise - predicted_noise_label) * 2.0)
-        
-        iteration_loss = tf.keras.losses.mean_squared_error(predicted_noise, true_noise)
-        total_loss += tf.reduce_mean(iteration_loss)
-        denoised_video = subtract_noise(denoised_video, predicted_noise)
-        denoised_video = reintegrate_noise(denoised_video, predicted_noise, reintegration_factor)
+        with tf.GradientTape() as tape:
+            predicted_noise_label = noise_predictor_model([denoised_video, label_data, timestep], training=True)
+            predicted_noise = noise_predictor_model([denoised_video, np.zeros_like(label_data), timestep], training=True)
+            
+            # take the difference between the predictions and amplify the noise
+            predicted_noise = tf.abs((predicted_noise - predicted_noise_label) * 2.0)
+            
+            iteration_loss = tf.keras.losses.mean_squared_error(predicted_noise, true_noise)
+            total_loss += tf.reduce_mean(iteration_loss)
+            denoised_video = subtract_noise(denoised_video, predicted_noise)
+            denoised_video = reintegrate_noise(denoised_video, predicted_noise, reintegration_factor)
+            gradients = tape.gradient(total_loss, noise_predictor_model.trainable_variables)
+            
+            # Update weights
+            optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
 
     return total_loss
 
@@ -88,60 +89,20 @@ optimizer = tf.keras.optimizers.Adam()
 num_epochs = 100
 reintegration_factor = 0.9
 
-# for epoch in range(num_epochs):
-#     print(f'On epoch {epoch}', flush=True)
-    
-#     for i in range(100):
-#         print(f'On epoch {i}', flush=True)
-        
-#         dataset = np.load(f'dataset_p{i}.npy', allow_pickle=True)
-        
-#         c = 0
-#         for batch in dataset:
-#             video_data = batch[0]
-#             label_data = batch[1]
-            
-#             print('got labels', flush=True)
-            
-#             T = np.random.randint(1, 101)
-#             true_noise = get_noise(video_data.shape, timestep=T)  # Generate true noise
-            
-#             print('generated noise', flush=True)
-            
-#             with tf.GradientTape() as tape:
-#                 loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=100)
-            
-#             gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
-#             optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
-            
-#             if c % 10 == 0:
-#                 print(f'On batch {batch}', flush=True)
-                
-#             c += 1
-            
-#             break # temp
-        
-#         break # temp
-                        
-#     print(f'Epoch {epoch} loss: {loss}\n', flush=True)
-
+# Load dataset
 dataset = np.load(f'dataset_p0.npy', allow_pickle=True)
-print('loaded dataset', flush=True)
 video_data = dataset[0][0]
-print('got video data', flush=True)
 label_data = dataset[0][1]
-print('got label', flush=True)
 T = np.random.randint(1, 101)
 true_noise = get_noise(video_data.shape, timestep=T)  # Generate true noise
-print('generated noise', flush=True)
 
-with tf.GradientTape() as tape:
-    print('time for loss', flush=True)
-    loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=1)
-print('get gradients', flush=True)
-gradients = tape.gradient(loss, noise_predictor_model.trainable_variables)
-print('apply gradients', flush=True)
-optimizer.apply_gradients(zip(gradients, noise_predictor_model.trainable_variables))
+# Use GPU for training
+with tf.device('/gpu:0'):
+    # Train loop
+    for epoch in range(num_epochs):
+        loss = iterative_diffusion_loss(true_noise, video_data + true_noise, T, label_data, noise_predictor_model, reintegration_factor, num_iterations=1)
+        print(f'Epoch {epoch+1}, Loss: {loss.numpy():.4f}')
 
+# Save the trained model
 noise_predictor_model.save('noise_predictor_model.h5')
-print('Done training!', flush=True)
+print('Done training!')
