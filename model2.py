@@ -4,6 +4,23 @@ from keras.layers import Input, Conv3D, concatenate, UpSampling3D, Reshape, Perm
 from keras.models import Model
 from tqdm import tqdm
 
+import tensorflow as tf
+
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(f"{len(gpus)} Physical GPUs, {len(logical_gpus)} Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
+else:
+    print("No GPU devices found.")
+
+
 VIDEO_SHAPE = (224, 224)
 
 def get_noise(shape, timestep, mean=0, base_std=1):
