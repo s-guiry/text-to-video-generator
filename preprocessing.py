@@ -14,7 +14,7 @@ LENGTH = 5
 PATH = 'datasets/kinetics-dataset-main/k700-2020'
 # PATH = 'test-samples/'
 FRAME_SIZE = (224, 224)
-BATCH_SIZE = int(input(f'Enter batch size (1 to 700): '))
+BATCH_SIZE = int(input(f'Enter amount of labels (1 to 700): '))
 
 # Load Universal Sentence Encoder model from TensorFlow Hub
 embed = hub.load('https://tfhub.dev/google/universal-sentence-encoder/4')
@@ -93,7 +93,8 @@ for batch in process_videos_in_batches(files, BATCH_SIZE):
     dataset_array = np.array(dataset_embedded, dtype=object)
 
     # Save dataset
-    np.save(f'dataset_p{i}.npy', dataset_array)
+    # np.save(f'dataset_p{i}.npy', dataset_array)
+    np.save(f'onelabel.npy', dataset_array)
     
     print(f'Done with index {i}')
     print()
