@@ -4,22 +4,14 @@ from keras.layers import Input, Conv3D, concatenate, UpSampling3D, Reshape, Perm
 from keras.models import Model
 from tqdm import tqdm
 
-import tensorflow as tf
-
-gpus = tf.config.list_physical_devices('GPU')
-if gpus:
-    try:
-        # Currently, memory growth needs to be the same across GPUs
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        print(f"{len(gpus)} Physical GPUs, {len(logical_gpus)} Logical GPUs")
-    except RuntimeError as e:
-        # Memory growth must be set before GPUs have been initialized
-        print(e)
+# Setup to force use the GPU if available
+physical_devices = tf.config.list_physical_devices('GPU')
+if physical_devices:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    device = '/gpu:0'
 else:
-    print("No GPU devices found.")
-
+    device = '/cpu:0'  # Falls back to CPU if no GPU is found
+print(f"Using device {device}")
 
 VIDEO_SHAPE = (224, 224)
 
@@ -56,36 +48,22 @@ def noise_predictor(input_size, label_size, timestep_size):
 
 optimizer = tf.keras.optimizers.Adam()
 
-# Define input dimensions correctly as per your data and network architecture
 input_shape = (50, 224, 224, 3)
 label_shape = (512,)
 timestep_shape = (1,)
 
-# Create model
 model = noise_predictor(input_shape, label_shape, timestep_shape)
 
 # Load dataset
 dataset = np.load('dataset_p0.npy', allow_pickle=True)
-video_data = dataset[0][0]  # Assuming video data is stored as the first element
-label_data = dataset[0][1]  # Assuming label data is stored as the second element
-T = np.random.randint(1, 101)  # Random timestep
+video_data = dataset[0][0]
+label_data = dataset[0][1]
+T = np.random.randint(1, 101)
 true_noise = get_noise(video_data.shape, T)
 
-# Example training loop with tqdm
+# Training loop with explicit GPU usage
 epochs = 10
-for epoch in tqdm(range(epochs), desc='Training Progress'):
-    with tf.GradientTape() as tape:
-        # Generate predictions
-        predictions = model([np.expand_dims(video_data, 0), np.expand_dims(label_data, 0), np.array([[T]])])
-        # Calculate loss (here using mean squared error for simplicity)
-        loss = tf.reduce_mean(tf.square(predictions - true_noise))
-
-    # Calculate gradients and update model weights
-    grads = tape.gradient(loss, model.trainable_variables)
-    optimizer.apply_gradients(zip(grads, model.trainable_variables))
-
-    tqdm.write(f"Epoch {epoch+1}, Loss: {loss.numpy():.4f}")
-
-# Save the trained model
-model.save('noise_predictor_model.h5')
-print('Done training and model saved!')
+with tf.device(device):  # Forces the use of GPU/CPU depending on the availability
+    for epoch in tqdm(range(epochs), desc='Training Progress'):
+        with tf.GradientTape() as tape:
+            predictions = model([np.expand_dims(video_data, 
