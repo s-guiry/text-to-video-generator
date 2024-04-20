@@ -9,8 +9,8 @@ set_global_policy('mixed_float16')
 
 
 # Setup for mixed precision
-policy = mixed_precision.Policy('mixed_float16')
-mixed_precision.set_policy(policy)
+# policy = mixed_precision.Policy('mixed_float16')
+# mixed_precision.set_policy(policy)
 
 VIDEO_SHAPE = (224, 224)
 
