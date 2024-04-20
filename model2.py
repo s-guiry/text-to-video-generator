@@ -49,7 +49,7 @@ def noise_predictor(input_size, label_size, timestep_size):
     model = Model(inputs=[inputs, label_inputs, timestep_inputs], outputs=output)
     return model
 
-optimizer = tf.keras.optimizers.Adam()
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001, clipnorm=1.0)
 
 input_shape = (50, 224, 224, 3)
 label_shape = (512,)
