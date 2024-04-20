@@ -3,7 +3,10 @@ import tensorflow as tf
 from keras.layers import Input, Conv3D, concatenate, UpSampling3D, Reshape, Permute, BatchNormalization
 from keras.models import Model
 from tqdm import tqdm
-from tensorflow.keras.mixed_precision import experimental as mixed_precision
+from tensorflow.keras.mixed_precision import set_global_policy
+
+set_global_policy('mixed_float16')
+
 
 # Setup for mixed precision
 policy = mixed_precision.Policy('mixed_float16')
