@@ -26,15 +26,16 @@ def get_noise(shape, timestep, mean=0, base_std=1):
 T = 100
 initial_noise = get_noise((50, 224, 224, 3), T)
 
+# Assuming initial_noise shape is (50, 224, 224, 3), and we want to match this batch size for other inputs
+replicated_embedding = tf.tile(tf.reshape(embedding, (1, -1)), [50, 1])
+replicated_timestep = tf.tile(np.array([[T]]), [50, 1])
+
 # Initialize video writer
 video = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (224, 224))
 
 # Use tqdm to track progress
 with tqdm(total=T + 1, desc='Generating Noise') as pbar:
     while T >= 0:
-        # Assuming initial_noise shape is (50, 224, 224, 3), and we want to match this batch size for other inputs
-        replicated_embedding = tf.tile(tf.reshape(embedding, (1, -1)), [50, 1])
-        replicated_timestep = tf.tile(np.array([[T]]), [50, 1])
         
         # Now all inputs have the same batch size
         noise = model.predict([initial_noise, replicated_embedding, replicated_timestep])
