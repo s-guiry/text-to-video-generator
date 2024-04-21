@@ -2,6 +2,7 @@ import tensorflow_hub as hub
 import tensorflow as tf
 import numpy as np
 import cv2
+from tqdm import tqdm
 
 # Load the noise predictor model
 model = tf.keras.models.load_model('noise_predictor_model.h5')
@@ -25,27 +26,32 @@ def get_noise(shape, timestep, mean=0, base_std=1):
 T = 100
 initial_noise = get_noise((50, 224, 224, 3), T)
 
-while T >= 0:
-    # Get the predicted noise
-    noise = model.predict([initial_noise, embedding.reshape(1, -1), np.array([[T]])])
-    
-    # Normalize noise to [-1, 1] range
-    normalized_noise = (noise - np.min(noise)) / (np.max(noise) - np.min(noise)) * 2 - 1
-    
-    # Update initial noise
-    initial_noise += 0.9 * normalized_noise
-    
-    # Clip noise to stay within valid image range
-    initial_noise = np.clip(initial_noise, -1, 1)
-    
-    # Decrease the timestep
-    T -= 1
+# Initialize video writer
+video = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (224, 224))
+
+# Use tqdm to track progress
+with tqdm(total=T + 1, desc='Generating Noise') as pbar:
+    while T >= 0:
+        # Get the predicted noise
+        noise = model.predict([initial_noise, embedding.reshape(1, -1), np.array([[T]])])
+        
+        # Normalize noise to [-1, 1] range
+        normalized_noise = (noise - np.min(noise)) / (np.max(noise) - np.min(noise)) * 2 - 1
+        
+        # Update initial noise
+        initial_noise += 0.9 * normalized_noise
+        
+        # Clip noise to stay within valid image range
+        initial_noise = np.clip(initial_noise, -1, 1)
+        
+        # Decrease the timestep
+        T -= 1
+        
+        # Increment tqdm progress bar
+        pbar.update(1)
 
 # Scale noise back to [0, 255] range for visualization
 noise_frames = ((initial_noise + 1) * 127.5).astype(np.uint8)
-
-# Initialize video writer
-video = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (224, 224))
 
 # Write frames to video
 for frame in noise_frames:
