@@ -56,7 +56,7 @@ timestep_shape = (1,)
 model = noise_predictor(input_shape, label_shape, timestep_shape)
 
 # Processing multiple datasets
-num_datasets = 21  # From dataset_p0.npy to dataset_p50.npy
+num_datasets = 12 # From dataset_p0.npy to dataset_p12.npy
 epochs = 10
 
 for i in range(num_datasets):
