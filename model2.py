@@ -4,6 +4,7 @@ from keras.layers import Input, Conv3D, concatenate, UpSampling3D, Reshape, Perm
 from keras.models import Model
 from tqdm import tqdm
 from tensorflow.keras.mixed_precision import set_global_policy
+import tensorflow_hub as hub
 
 # Set precision policy to float32
 set_global_policy('float32')
