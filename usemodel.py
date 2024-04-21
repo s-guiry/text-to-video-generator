@@ -22,24 +22,18 @@ replicated_timestep = tf.tile(tf.reshape(np.array([T]), (1, 1)), [1, 1])
 
 video = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 10, (224, 224))
 with tqdm(total=T + 1, desc='Generating Noise') as pbar:
-    for _ in range(T + 1):
+    for i in range(T + 1):
         noise = model.predict([initial_noise, replicated_embedding, replicated_timestep])
         normalized_noise = (noise - np.min(noise)) / (np.max(noise) - np.min(noise)) * 2 - 1
-        initial_noise += 0.9 * normalized_noise
-        initial_noise = np.clip(initial_noise, -1, 1)
-        
-        # Convert the first frame of the batch from noise to an image
-        frame = (255 * (initial_noise[0, 0] - np.min(initial_noise[0, 0])) / (np.max(initial_noise[0, 0]) - np.min(initial_noise[0, 0]))).astype(np.uint8)
+        print(f"Normalized Noise Stats - Iteration {i}: Min: {np.min(normalized_noise)}, Max: {np.max(normalized_noise)}, Mean: {np.mean(normalized_noise)}")
 
-        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # Convert RGB to BGR
-        
-	#print(f"Frame Stats - Min: {np.min(frame)}, Max: {np.max(frame)}, Mean: {np.mean(frame)}")
-        
-	#cv2.imshow('Frame', frame_bgr)
-        #cv2.waitKey(1)  # Display the frame briefly; press any key in GUI window to close
+        initial_noise += normalized_noise  # Updated rule without scaling to check impact
+        print(f"Initial Noise Stats - Iteration {i}: Min: {np.min(initial_noise)}, Max: {np.max(initial_noise)}, Mean: {np.mean(initial_noise)}")
 
+        frame = ((initial_noise[0, 0] + 1) * 127.5).astype(np.uint8)
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         video.write(frame_bgr)  # Write frame to video
         
         pbar.update(1)
 
-video.release()  # Finalize the video file
+video.release()
