@@ -24,7 +24,8 @@ def get_noise(shape, timestep, mean=0, base_std=1):
 
 # Generate the initial noise
 T = 100
-initial_noise = get_noise((50, 224, 224, 3), T)
+# Ensure initial_noise is generated with the correct shape
+initial_noise = get_noise((1, 50, 224, 224, 3), T)  # Added 1 for batch size, and 50 for frames
 
 # Assuming initial_noise shape is (50, 224, 224, 3), and we want to match this batch size for other inputs
 replicated_embedding = tf.tile(tf.reshape(embedding, (1, -1)), [50, 1])
