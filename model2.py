@@ -5,7 +5,7 @@ from keras.models import Model
 from tqdm import tqdm
 from tensorflow.keras.mixed_precision import set_global_policy
 
-set_global_policy('mixed_float16')
+set_global_policy('float32')
 
 
 # Setup for mixed precision
@@ -15,7 +15,7 @@ set_global_policy('mixed_float16')
 VIDEO_SHAPE = (224, 224)
 
 def get_noise(shape, timestep, mean=0, base_std=1):
-    std = base_std / np.sqrt(1 + timestep)
+    std = base_std / (np.sqrt(1 + timestep) + 0.001)  # Adding a small epsilon to avoid division by zero
     noise = np.random.normal(mean, std, shape)
     return noise
 
