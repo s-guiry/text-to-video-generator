@@ -33,7 +33,7 @@ video = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (224,
 with tqdm(total=T + 1, desc='Generating Noise') as pbar:
     while T >= 0:
         # Get the predicted noise
-        noise = model.predict([initial_noise, embedding.reshape(1, -1), np.array([[T]])])
+        noise = model.predict([initial_noise, tf.reshape(embedding, (1, -1)), np.array([[T]])])
         
         # Normalize noise to [-1, 1] range
         normalized_noise = (noise - np.min(noise)) / (np.max(noise) - np.min(noise)) * 2 - 1
