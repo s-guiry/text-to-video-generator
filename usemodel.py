@@ -32,8 +32,12 @@ video = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (224,
 # Use tqdm to track progress
 with tqdm(total=T + 1, desc='Generating Noise') as pbar:
     while T >= 0:
-        # Get the predicted noise
-        noise = model.predict([initial_noise, tf.reshape(embedding, (1, -1)), np.array([[T]])])
+        # Assuming initial_noise shape is (50, 224, 224, 3), and we want to match this batch size for other inputs
+        replicated_embedding = tf.tile(tf.reshape(embedding, (1, -1)), [50, 1])
+        replicated_timestep = tf.tile(np.array([[T]]), [50, 1])
+        
+        # Now all inputs have the same batch size
+        noise = model.predict([initial_noise, replicated_embedding, replicated_timestep])
         
         # Normalize noise to [-1, 1] range
         normalized_noise = (noise - np.min(noise)) / (np.max(noise) - np.min(noise)) * 2 - 1
