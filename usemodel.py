@@ -29,11 +29,14 @@ with tqdm(total=T + 1, desc='Generating Noise') as pbar:
         initial_noise = np.clip(initial_noise, -1, 1)
         
         # Convert the first frame of the batch from noise to an image
-        frame = ((initial_noise[0, 0] + 1) * 127.5).astype(np.uint8)
+        frame = (255 * (initial_noise[0, 0] - np.min(initial_noise[0, 0])) / (np.max(initial_noise[0, 0]) - np.min(initial_noise[0, 0]))).astype(np.uint8)
+
         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # Convert RGB to BGR
         
-        cv2.imshow('Frame', frame_bgr)
-        cv2.waitKey(1)  # Display the frame briefly; press any key in GUI window to close
+	#print(f"Frame Stats - Min: {np.min(frame)}, Max: {np.max(frame)}, Mean: {np.mean(frame)}")
+        
+	#cv2.imshow('Frame', frame_bgr)
+        #cv2.waitKey(1)  # Display the frame briefly; press any key in GUI window to close
 
         video.write(frame_bgr)  # Write frame to video
         
